@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anesthesiology Suggestion Box — Baylor St. Luke's</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0f2342; --blue: #1a56a8; --sky: #3b82f6; --teal: #0ea5e9;
+    --green: #10b981; --amber: #f59e0b; --red: #ef4444; --slate: #64748b;
+    --light: #f8fafc; --white: #ffffff; --border: #e2e8f0;
+  }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #0a1628 0%, #1a3460 50%, #0a1628 100%); min-height: 100vh; color: #1e293b; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .page-center { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+  .card { background: var(--white); border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 580px; box-shadow: 0 30px 80px rgba(0,0,0,0.35); }
+  .brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; }
+  .brand-icon { font-size: 40px; }
+  .brand-name { font-size: 14px; font-weight: 700; color: var(--navy); line-height: 1.3; }
+  .brand-dept { font-size: 12px; color: var(--slate); }
+  .card-title { font-size: 26px; font-weight: 800; color: var(--navy); text-align: center; margin-bottom: 8px; line-height: 1.2; }
+  .card-sub { font-size: 14px; color: var(--slate); text-align: center; line-height: 1.6; margin-bottom: 28px; }
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .feature-card { background: var(--light); border-radius: 12px; padding: 16px 10px; text-align: center; }
+  .feature-card .fi { font-size: 26px; margin-bottom: 6px; }
+  .feature-card h4 { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .feature-card p { font-size: 11px; color: var(--slate); line-height: 1.4; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+  .stat-box { background: #eff6ff; border-radius: 10px; padding: 14px; text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 800; color: var(--sky); }
+  .stat-label { font-size: 11px; color: var(--slate); margin-top: 2px; }
+  .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, #1e40af, var(--sky)); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 10px; box-shadow: 0 4px 14px rgba(59,130,246,0.4); transition: transform 0.1s, box-shadow 0.1s; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(59,130,246,0.5); }
+  .btn-ghost { width: 100%; padding: 12px; background: transparent; color: var(--slate); border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .btn-ghost:hover { background: var(--light); }
+  .btn-back { background: none; border: none; color: var(--slate); font-size: 14px; font-weight: 600; cursor: pointer; padding: 0; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 4px; }
+  .btn-back:hover { color: var(--navy); }
+  label.lbl { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; }
+  .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+  .cat-btn { padding: 10px 4px; border-radius: 8px; border: 1.5px solid var(--border); background: white; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; font-size: 11px; color: #374151; line-height: 1.2; text-align: center; transition: all 0.15s; }
+  .cat-btn .ci { font-size: 20px; }
+  .cat-btn:hover { border-color: var(--sky); background: #eff6ff; }
+  .cat-btn.selected { border-color: var(--sky); background: #eff6ff; color: #1d4ed8; font-weight: 600; }
+  .priority-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  .pri-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1.5px solid var(--border); background: white; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; color: var(--slate); }
+  .pri-btn.selected-low { border-color: #6b7280; background: #f9fafb; color: #6b7280; }
+  .pri-btn.selected-medium { border-color: var(--amber); background: #fffbeb; color: var(--amber); }
+  .pri-btn.selected-high { border-color: var(--red); background: #fef2f2; color: var(--red); }
+  input[type="text"], input[type="password"], textarea { width: 100%; padding: 11px 14px; border-radius: 8px; border: 1.5px solid var(--border); font-size: 14px; font-family: inherit; outline: none; margin-bottom: 20px; transition: border-color 0.15s; color: #1e293b; }
+  input[type="text"]:focus, input[type="password"]:focus, textarea:focus { border-color: var(--sky); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+  textarea { height: 130px; resize: vertical; }
+  .error-box { background: #fef2f2; color: var(--red); border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; border: 1px solid #fecaca; }
+  .privacy-note { font-size: 12px; color: #9ca3af; text-align: center; margin-top: 8px; }
+  .success-view { text-align: center; padding: 16px 0; }
+  .success-icon { font-size: 70px; margin-bottom: 16px; }
+  #view-admin { background: #f1f5f9; min-height: 100vh; padding: 28px 20px; }
+  .admin-wrap { max-width: 900px; margin: 0 auto; }
+  .admin-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .admin-topbar h2 { font-size: 22px; font-weight: 800; color: var(--navy); }
+  .admin-topbar p { font-size: 13px; color: var(--slate); margin-top: 2px; }
+  .btn-signout { padding: 8px 18px; border: 1.5px solid var(--border); border-radius: 8px; background: white; font-size: 13px; font-weight: 600; color: var(--slate); cursor: pointer; }
+  .btn-signout:hover { background: #f8fafc; }
+  .admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .a-stat { background: white; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .a-stat .n { font-size: 26px; font-weight: 800; }
+  .a-stat .l { font-size: 12px; color: var(--slate); margin-top: 2px; }
+  .n-total { color: var(--navy); } .n-new { color: var(--sky); } .n-review { color: var(--amber); } .n-resolved { color: var(--green); }
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  select { padding: 9px 14px; border-radius: 8px; border: 1.5px solid var(--border); background: white; font-size: 13px; color: #374151; cursor: pointer; font-family: inherit; }
+  .suggestion-list { display: flex; flex-direction: column; gap: 12px; }
+  .s-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); border-left: 4px solid transparent; }
+  .s-card.new { border-left-color: var(--sky); }
+  .s-card.reviewed { border-left-color: var(--amber); }
+  .s-card.resolved { border-left-color: var(--green); }
+  .s-card-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-cat { background: #f1f5f9; color: #475569; }
+  .badge-low { background: #f3f4f6; color: #6b7280; }
+  .badge-medium { background: #fffbeb; color: var(--amber); }
+  .badge-high { background: #fef2f2; color: var(--red); }
+  .badge-new { background: #eff6ff; color: var(--sky); }
+  .badge-reviewed { background: #fffbeb; color: var(--amber); }
+  .badge-resolved { background: #ecfdf5; color: var(--green); }
+  .s-date { font-size: 12px; color: #94a3b8; }
+  .s-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .s-body { font-size: 14px; color: #475569; line-height: 1.6; }
+  .s-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .act-btn { padding: 6px 14px; border-radius: 6px; border: 1.5px solid; background: transparent; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .act-review { border-color: var(--amber); color: var(--amber); }
+  .act-review:hover { background: #fffbeb; }
+  .act-resolve { border-color: var(--green); color: var(--green); }
+  .act-resolve:hover { background: #ecfdf5; }
+  .act-reopen { border-color: var(--slate); color: var(--slate); }
+  .act-reopen:hover { background: var(--light); }
+  .act-delete { border-color: var(--red); color: var(--red); margin-left: auto; }
+  .act-delete:hover { background: #fef2f2; }
+  .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+  .empty-state .ei { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 15px; }
+  @media (max-width: 600px) {
+    .card { padding: 28px 20px; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .category-grid { grid-template-columns: repeat(2, 1fr); }
+    .admin-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="view-home" class="view active">
+  <div class="page-center">
+    <div class="card">
+      <div class="brand">
+        <div class="brand-icon">🏥</div>
+        <div>
+          <div class="brand-name">Baylor St. Luke's Medical Center</div>
+          <div class="brand-dept">Department of Anesthesiology · Baylor College of Medicine</div>
+        </div>
+      </div>
+      <h1 class="card-title">Anonymous Suggestion Box</h1>
+      <p class="card-sub">Your voice matters. Share feedback, ideas, or concerns — completely anonymously. No identifying information is ever collected or stored.</p>
+      <div class="feature-grid">
+        <div class="feature-card"><div class="fi">🔒</div><h4>100% Anonymous</h4><p>No login, no name, no tracking of any kind.</p></div>
+        <div class="feature-card"><div class="fi">💡</div><h4>All Topics Welcome</h4><p>Safety, scheduling, culture, equipment — anything.</p></div>
+        <div class="feature-card"><div class="fi">📊</div><h4>Leadership Reviews</h4><p>Every submission is reviewed by department leadership.</p></div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total Submissions</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-resolved">0</div><div class="stat-label">Resolved</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-inreview">0</div><div class="stat-label">In Review</div></div>
+      </div>
+      <button class="btn-primary" onclick="showView('submit')">📝 &nbsp;Submit a Suggestion</button>
+      <button class="btn-ghost" onclick="showView('login')">Admin Access</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMIT -->
+<div id="view-submit" class="view">
+  <div class="page-center">
+    <div class="card">
+      <button class="btn-back" onclick="showView('home')">← Back</button>
+      <h2 class="card-title" style="text-align:left;font-size:21px;margin-bottom:4px;">New Suggestion</h2>
+      <p class="card-sub" style="text-align:left;margin-bottom:24px;font-size:13px;">More detail helps leadership take action. Nothing you write is tied to your identity.</p>
+      <label class="lbl">Category *</label>
+      <div class="category-grid">
+        <button class="cat-btn" data-cat="scheduling" onclick="selectCat(this)"><span class="ci">📅</span>Scheduling &amp; Staffing</button>
+        <button class="cat-btn" data-cat="safety" onclick="selectCat(this)"><span class="ci">🛡️</span>Patient Safety</button>
+        <button class="cat-btn" data-cat="workflow" onclick="selectCat(this)"><span class="ci">⚙️</span>Workflow &amp; Efficiency</button>
+        <button class="cat-btn" data-cat="equipment" onclick="selectCat(this)"><span class="ci">🔧</span>Equipment &amp; Supplies</button>
+        <button class="cat-btn" data-cat="culture" onclick="selectCat(this)"><span class="ci">🤝</span>Team Culture &amp; Wellbeing</button>
+        <button class="cat-btn" data-cat="education" onclick="selectCat(this)"><span class="ci">📚</span>Education &amp; Training</button>
+        <button class="cat-btn" data-cat="compensation" onclick="selectCat(this)"><span class="ci">💰</span>Compensation &amp; Benefits</button>
+        <button class="cat-btn" data-cat="other" onclick="selectCat(this)"><span class="ci">💬</span>Other</button>
+      </div>
+      <label class="lbl">Priority</label>
+      <div class="priority-row">
+        <button class="pri-btn" data-pri="low" onclick="selectPri(this)">🟢 Low</button>
+        <button class="pri-btn selected-medium" data-pri="medium" onclick="selectPri(this)">🟡 Medium</button>
+        <button class="pri-btn" data-pri="high" onclick="selectPri(this)">🔴 High / Urgent</button>
+      </div>
+      <label class="lbl">Brief Title *</label>
+      <input type="text" id="f-title" placeholder="e.g. Night float assignments are inequitable between groups" maxlength="120">
+      <label class="lbl">Details</label>
+      <textarea id="f-message" placeholder="Describe the issue, idea, or suggestion in as much detail as you're comfortable sharing…"></textarea>
+      <div class="error-box" id="form-error" style="display:none;"></div>
+      <button class="btn-primary" onclick="submitSuggestion()">🔒 &nbsp;Submit Anonymously</button>
+      <p class="privacy-note">No personal information is recorded with this submission.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="view-success" class="view">
+  <div class="page-center">
+    <div class="card">
+      <div class="success-view">
+        <div class="success-icon">✅</div>
+        <h2 class="card-title">Suggestion Received</h2>
+        <p class="card-sub" style="margin-bottom:32px;">Thank you for your feedback. Your submission is completely anonymous and will be reviewed by department leadership.</p>
+        <button class="btn-primary" onclick="showView('submit')">Submit Another</button>
+        <button class="btn-ghost" onclick="showView('home')">Back to Home</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="view-login" class="view">
+  <div class="page-center">
+    <div class="card" style="max-width:420px;">
+      <button class="btn-back" onclick="showView('home')">← Back</button>
+      <h2 class="card-title" style="text-align:left;font-size:21px;margin-bottom:4px;">Admin Access</h2>
+      <p class="card-sub" style="text-align:left;margin-bottom:24px;">For department leadership only.</p>
+      <label class="lbl">Password</label>
+      <input type="password" id="admin-pw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter') adminLogin()">
+      <div class="error-box" id="login-error" style="display:none;">Incorrect password. Please try again.</div>
+      <button class="btn-primary" onclick="adminLogin()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="view-admin" class="view">
+  <div class="admin-wrap">
+    <div class="admin-topbar">
+      <div>
+        <h2>🏥 Suggestion Box — Admin Dashboard</h2>
+        <p>Baylor Anesthesiology · Baylor College of Medicine</p>
+      </div>
+      <button class="btn-signout" onclick="adminSignOut()">Sign Out</button>
+    </div>
+    <div class="admin-stats">
+      <div class="a-stat"><div class="n n-total" id="a-total">0</div><div class="l">Total</div></div>
+      <div class="a-stat"><div class="n n-new" id="a-new">0</div><div class="l">New</div></div>
+      <div class="a-stat"><div class="n n-review" id="a-review">0</div><div class="l">In Review</div></div>
+      <div class="a-stat"><div class="n n-resolved" id="a-resolved">0</div><div class="l">Resolved</div></div>
+    </div>
+    <div class="filter-bar">
+      <select id="filter-cat" onchange="renderAdmin()">
+        <option value="all">All Categories</option>
+        <option value="scheduling">📅 Scheduling &amp; Staffing</option>
+        <option value="safety">🛡️ Patient Safety</option>
+        <option value="workflow">⚙️ Workflow &amp; Efficiency</option>
+        <option value="equipment">🔧 Equipment &amp; Supplies</option>
+        <option value="culture">🤝 Team Culture &amp; Wellbeing</option>
+        <option value="education">📚 Education &amp; Training</option>
+        <option value="compensation">💰 Compensation &amp; Benefits</option>
+        <option value="other">💬 Other</option>
+      </select>
+      <select id="filter-status" onchange="renderAdmin()">
+        <option value="all">All Statuses</option>
+        <option value="new">New</option>
+        <option value="reviewed">In Review</option>
+        <option value="resolved">Resolved</option>
+      </select>
+      <select id="filter-sort" onchange="renderAdmin()">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="priority">By Priority</option>
+      </select>
+    </div>
+    <div class="suggestion-list" id="suggestion-list"></div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'baylor_anesthesia_suggestions';
+const ADMIN_PASSWORD = 'Baylor2024!';
+const CAT_MAP = {
+  scheduling:'📅 Scheduling & Staffing', safety:'🛡️ Patient Safety',
+  workflow:'⚙️ Workflow & Efficiency', equipment:'🔧 Equipment & Supplies',
+  culture:'🤝 Team Culture & Wellbeing', education:'📚 Education & Training',
+  compensation:'💰 Compensation & Benefits', other:'💬 Other'
+};
+let selectedCat = '', selectedPri = 'medium';
+function loadData() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } }
+function saveData(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  window.scrollTo(0,0);
+  if (name==='home') updateHomeStats();
+  if (name==='submit') resetForm();
+  if (name==='admin') renderAdmin();
+}
+function updateHomeStats() {
+  const d = loadData();
+  document.getElementById('stat-total').textContent = d.length;
+  document.getElementById('stat-resolved').textContent = d.filter(s=>s.status==='resolved').length;
+  document.getElementById('stat-inreview').textContent = d.filter(s=>s.status==='reviewed').length;
+}
+function resetForm() {
+  selectedCat=''; selectedPri='medium';
+  document.getElementById('f-title').value='';
+  document.getElementById('f-message').value='';
+  document.getElementById('form-error').style.display='none';
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.pri-btn').forEach(b=>{ b.className='pri-btn'; if(b.dataset.pri==='medium') b.classList.add('selected-medium'); });
+}
+function selectCat(btn) { document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); selectedCat=btn.dataset.cat; }
+function selectPri(btn) { document.querySelectorAll('.pri-btn').forEach(b=>b.className='pri-btn'); btn.classList.add('selected-'+btn.dataset.pri); selectedPri=btn.dataset.pri; }
+function submitSuggestion() {
+  const title = document.getElementById('f-title').value.trim();
+  const message = document.getElementById('f-message').value.trim();
+  if (!selectedCat) { showError('Please select a category.'); return; }
+  if (!title || title.length<5) { showError('Please add a brief title (at least 5 characters).'); return; }
+  document.getElementById('form-error').style.display='none';
+  const entry = { id: Date.now().toString(), category: selectedCat, priority: selectedPri, title, message, status: 'new', timestamp: new Date().toISOString() };
+  const d = loadData(); d.unshift(entry); saveData(d);
+  showView('success');
+}
+function showError(msg) { const e=document.getElementById('form-error'); e.textContent='⚠ '+msg; e.style.display='block'; }
+function adminLogin() {
+  const pw=document.getElementById('admin-pw').value;
+  const err=document.getElementById('login-error');
+  if (pw===ADMIN_PASSWORD) { err.style.display='none'; document.getElementById('admin-pw').value=''; showView('admin'); }
+  else { err.style.display='block'; }
+}
+function adminSignOut() { showView('home'); }
+function renderAdmin() {
+  let d = loadData();
+  document.getElementById('a-total').textContent = d.length;
+  document.getElementById('a-new').textContent = d.filter(s=>s.status==='new').length;
+  document.getElementById('a-review').textContent = d.filter(s=>s.status==='reviewed').length;
+  document.getElementById('a-resolved').textContent = d.filter(s=>s.status==='resolved').length;
+  const cat=document.getElementById('filter-cat').value;
+  const status=document.getElementById('filter-status').value;
+  const sort=document.getElementById('filter-sort').value;
+  if (cat!=='all') d=d.filter(s=>s.category===cat);
+  if (status!=='all') d=d.filter(s=>s.status===status);
+  if (sort==='newest') d.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+  else if (sort==='oldest') d.sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
+  else if (sort==='priority') { const o={high:0,medium:1,low:2}; d.sort((a,b)=>o[a.priority]-o[b.priority]); }
+  const list=document.getElementById('suggestion-list');
+  if (!d.length) { list.innerHTML='<div class="empty-state"><div class="ei">📭</div><p>No suggestions found for these filters.</p></div>'; return; }
+  list.innerHTML=d.map(s=>{
+    const date=new Date(s.timestamp).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const statusLabel=s.status==='new'?'New':s.status==='reviewed'?'In Review':'Resolved';
+    return `<div class="s-card ${s.status}">
+      <div class="s-card-top">
+        <div class="badges">
+          <span class="badge badge-cat">${CAT_MAP[s.category]||s.category}</span>
+          <span class="badge badge-${s.priority}">${s.priority.toUpperCase()}</span>
+          <span class="badge badge-${s.status}">${statusLabel}</span>
+        </div>
+        <span class="s-date">${date}</span>
+      </div>
+      <div class="s-title">${escHtml(s.title)}</div>
+      ${s.message?`<div class="s-body">${escHtml(s.message)}</div>`:''}
+      <div class="s-actions">
+        ${s.status!=='reviewed'?`<button class="act-btn act-review" onclick="updateStatus('${s.id}','reviewed')">Mark In Review</button>`:''}
+        ${s.status!=='resolved'?`<button class="act-btn act-resolve" onclick="updateStatus('${s.id}','resolved')">Mark Resolved</button>`:''}
+        ${s.status!=='new'?`<button class="act-btn act-reopen" onclick="updateStatus('${s.id}','new')">Reopen</button>`:''}
+        <button class="act-btn act-delete" onclick="deleteSuggestion('${s.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function updateStatus(id,status) { saveData(loadData().map(s=>s.id===id?{...s,status}:s)); renderAdmin(); }
+function deleteSuggestion(id) { saveData(loadData().filter(s=>s.id!==id)); renderAdmin(); }
+function escHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+updateHomeStats();
+</script>
+</body>
+</html>
